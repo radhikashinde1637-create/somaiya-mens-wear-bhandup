@@ -1009,10 +1009,72 @@ service cloud.firestore {
                 <input type="number" class="form-control" id="formProdMinQty" value="5" min="1" required>
               </div>
 
-              <!-- Image URL -->
+              <!-- Product Image Section (Required: URL or File Upload with Base64 & Preview) -->
               <div class="col-12">
-                <label class="form-label small fw-bold">Product Image URL</label>
-                <input type="url" class="form-control" id="formProdImage" placeholder="https://images.unsplash.com/..." value="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=700">
+                <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                  <span><i class="fa-solid fa-image me-1 text-primary"></i> Product Image * <span class="text-danger fw-bold">(Required)</span></span>
+                  <span class="badge bg-light text-muted border fw-normal" style="font-size: 11px;">Upload File (Base64) or Enter URL</span>
+                </label>
+
+                <!-- Hidden actual image value container -->
+                <input type="hidden" id="formProdImageHidden" value="">
+
+                <div class="card border p-3 bg-light rounded-3">
+                  <div class="row g-3 align-items-center">
+                    
+                    <!-- Left: Upload or URL Inputs -->
+                    <div class="col-md-8">
+                      <!-- File Upload Drop Area -->
+                      <div class="mb-3">
+                        <label class="form-label small text-muted fw-semibold mb-1">
+                          <i class="fa-solid fa-cloud-arrow-up me-1 text-dark"></i> Option 1: Upload Image File (Converts to Base64)
+                        </label>
+                        <div class="input-group">
+                          <input type="file" class="form-control" id="formProdImageFile" accept="image/*" onchange="handleImageFileUpload(event)">
+                          <button class="btn btn-outline-secondary" type="button" onclick="clearUploadedImage()" title="Clear image">
+                            <i class="fa-solid fa-xmark"></i>
+                          </button>
+                        </div>
+                        <div class="form-text small text-muted" style="font-size: 11px;">
+                          Auto-converts local device photos to Base64 for instant preview, offline storage, and Firebase sync.
+                        </div>
+                      </div>
+
+                      <div class="d-flex align-items-center my-2 text-muted small">
+                        <hr class="flex-grow-1 m-0">
+                        <span class="px-2 fw-bold text-uppercase" style="font-size: 10px;">OR</span>
+                        <hr class="flex-grow-1 m-0">
+                      </div>
+
+                      <!-- Image URL Input -->
+                      <div>
+                        <label class="form-label small text-muted fw-semibold mb-1">
+                          <i class="fa-solid fa-link me-1 text-dark"></i> Option 2: Product Image URL *
+                        </label>
+                        <input type="text" class="form-control" id="formProdImage" placeholder="Paste image link e.g. https://... or /assets/products/..." oninput="handleImageUrlInput(this.value)">
+                        <div class="form-text small text-muted" style="font-size: 11px;">
+                          Direct image web link (Unsplash, CDN, or uploaded image).
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Right: Live Image Preview -->
+                    <div class="col-md-4 text-center">
+                      <div class="fw-bold small text-muted mb-1">Live Image Preview *</div>
+                      <div class="border rounded-3 p-1 bg-white position-relative shadow-sm mx-auto d-flex align-items-center justify-content-center overflow-hidden" 
+                           id="imagePreviewBox" 
+                           style="width: 140px; height: 160px; border: 2px dashed #ccc !important;">
+                        <div id="imagePreviewEmpty" class="text-center text-muted p-2">
+                          <i class="fa-regular fa-image fa-2x mb-1 text-secondary opacity-50"></i>
+                          <div style="font-size: 10.5px;" class="fw-semibold text-danger">No Image Selected *</div>
+                        </div>
+                        <img id="imagePreviewImg" src="" alt="Product Preview" class="w-100 h-100 object-fit-cover rounded-2 d-none" onerror="handleImageLoadError()">
+                      </div>
+                      <div id="imageStatusBadge" class="mt-2 small" style="font-size: 11px;"></div>
+                    </div>
+
+                  </div>
+                </div>
               </div>
 
               <!-- Generated Key Preview -->
@@ -1820,6 +1882,126 @@ service cloud.firestore {
       document.getElementById('keyPreviewText').textContent = key || 'name_size_colour';
     }
 
+    // ==================== PRODUCT IMAGE HANDLING (FILE UPLOAD BASE64 & URL PREVIEW) ====================
+    function handleImageFileUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file (JPG, PNG, WEBP).');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const rawDataUrl = evt.target.result;
+        
+        // Auto-scale to max 800px using HTML5 Canvas to optimize Base64 payload size for storage
+        const img = new Image();
+        img.onload = function() {
+          const maxDim = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
+          setProductImagePreview(optimizedDataUrl, 'File Uploaded (Base64)', true);
+        };
+        img.onerror = function() {
+          setProductImagePreview(rawDataUrl, 'File Uploaded (Base64)', true);
+        };
+        img.src = rawDataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleImageUrlInput(val) {
+      const trimmed = (val || '').trim();
+      if (!trimmed) {
+        clearUploadedImage();
+        return;
+      }
+      setProductImagePreview(trimmed, 'Web URL', false);
+    }
+
+    function setProductImagePreview(imgSrc, sourceLabel, isFileUpload) {
+      document.getElementById('formProdImageHidden').value = imgSrc;
+      document.getElementById('formProdImage').value = isFileUpload ? imgSrc.substring(0, 45) + '... (Base64 Data)' : imgSrc;
+      
+      const previewImg = document.getElementById('imagePreviewImg');
+      const previewEmpty = document.getElementById('imagePreviewEmpty');
+      const previewBox = document.getElementById('imagePreviewBox');
+      const badge = document.getElementById('imageStatusBadge');
+
+      if (previewImg) {
+        previewImg.src = imgSrc;
+        previewImg.classList.remove('d-none');
+      }
+      if (previewEmpty) {
+        previewEmpty.classList.add('d-none');
+      }
+      if (previewBox) {
+        previewBox.style.borderStyle = 'solid !important';
+        previewBox.style.borderColor = '#198754 !important';
+      }
+      if (badge) {
+        badge.innerHTML = `<span class="badge bg-success text-white"><i class="fa-solid fa-circle-check me-1"></i> ${sourceLabel}</span>`;
+      }
+    }
+
+    function handleImageLoadError() {
+      const badge = document.getElementById('imageStatusBadge');
+      if (badge) {
+        badge.innerHTML = `<span class="badge bg-danger text-white"><i class="fa-solid fa-triangle-exclamation me-1"></i> Invalid Image URL</span>`;
+      }
+    }
+
+    function clearUploadedImage() {
+      const fileInput = document.getElementById('formProdImageFile');
+      if (fileInput) fileInput.value = '';
+      
+      const textInput = document.getElementById('formProdImage');
+      if (textInput) textInput.value = '';
+      
+      const hiddenInput = document.getElementById('formProdImageHidden');
+      if (hiddenInput) hiddenInput.value = '';
+
+      const previewImg = document.getElementById('imagePreviewImg');
+      const previewEmpty = document.getElementById('imagePreviewEmpty');
+      const previewBox = document.getElementById('imagePreviewBox');
+      const badge = document.getElementById('imageStatusBadge');
+
+      if (previewImg) {
+        previewImg.src = '';
+        previewImg.classList.add('d-none');
+      }
+      if (previewEmpty) {
+        previewEmpty.classList.remove('d-none');
+      }
+      if (previewBox) {
+        previewBox.style.borderStyle = 'dashed !important';
+        previewBox.style.borderColor = '#ccc !important';
+      }
+      if (badge) {
+        badge.innerHTML = '';
+      }
+    }
+
     // Open Add Product Modal
     function openAddProductModal() {
       if (currentUser.role !== 'admin') {
@@ -1829,6 +2011,7 @@ service cloud.firestore {
       document.getElementById('productEntryForm').reset();
       document.getElementById('editProductId').value = '';
       document.getElementById('productModalHeading').innerHTML = '<i class="fa-solid fa-shirt me-2 text-warning"></i> Add New Product to Inventory';
+      clearUploadedImage();
       updateGeneratedKeyPreview();
 
       const modalEl = document.getElementById('productFormModal');
@@ -1856,7 +2039,14 @@ service cloud.firestore {
       document.getElementById('formProdSelling').value = item.price;
       document.getElementById('formProdQty').value = item.qty;
       document.getElementById('formProdMinQty').value = item.minQty || 5;
-      document.getElementById('formProdImage').value = item.image;
+
+      // Populate image and live preview
+      if (item.image) {
+        const isBase64 = item.image.startsWith('data:image');
+        setProductImagePreview(item.image, isBase64 ? 'Base64 Stored Image' : 'Current Image URL', isBase64);
+      } else {
+        clearUploadedImage();
+      }
 
       document.getElementById('productModalHeading').innerHTML = '<i class="fa-solid fa-pen-to-square me-2 text-warning"></i> Edit Product Stock &amp; Details';
       updateGeneratedKeyPreview();
@@ -1880,7 +2070,18 @@ service cloud.firestore {
       const sellingPrice = Number(document.getElementById('formProdSelling').value);
       const qty = Number(document.getElementById('formProdQty').value);
       const minQty = Number(document.getElementById('formProdMinQty').value) || 5;
-      const image = document.getElementById('formProdImage').value.trim() || 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=700';
+
+      // Extract image: prefer hidden actual base64/URL value, fallback to URL input
+      const hiddenImg = document.getElementById('formProdImageHidden').value.trim();
+      const rawUrlImg = document.getElementById('formProdImage').value.trim();
+      const image = hiddenImg || (rawUrlImg.startsWith('data:image') || rawUrlImg.startsWith('http') || rawUrlImg.startsWith('/') ? rawUrlImg : '');
+
+      // Image is strictly REQUIRED
+      if (!image) {
+        alert('Product Image is REQUIRED!\n\nPlease upload an image file (auto-converted to Base64) or enter a valid Product Image URL.');
+        document.getElementById('formProdImageFile').focus();
+        return;
+      }
 
       const productKey = `${name}_${size}_${colour}`.toLowerCase().replace(/\s+/g, '-');
 
