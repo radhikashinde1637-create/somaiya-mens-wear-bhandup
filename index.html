@@ -468,11 +468,46 @@
       z-index: 2;
     }
 
+    /* Circular white heart button (Wishlist) */
+    .wishlist-heart-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 38px;
+      height: 38px;
+      background: #ffffff;
+      color: #666666;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 4;
+      font-size: 16px;
+    }
+
+    .wishlist-heart-btn:hover {
+      transform: scale(1.15);
+      color: #e53935;
+    }
+
+    .wishlist-heart-btn.active {
+      color: #e53935;
+      background: #ffffff;
+    }
+
+    .wishlist-heart-btn.active i {
+      color: #e53935 !important;
+    }
+
     /* Circular white bag with plus icon */
     .bag-plus-btn {
       position: absolute;
       bottom: 10px;
-      right: 10px;
+      right: 54px;
       width: 38px;
       height: 38px;
       background: #ffffff;
@@ -492,6 +527,26 @@
       background: #000000;
       color: #ffffff;
       transform: scale(1.1);
+    }
+
+    /* Sticky Bottom Cart Bar (appears when cart > 0) */
+    .cart-sticky-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #111111;
+      color: #ffffff;
+      border-top: 2.5px solid var(--gold-accent);
+      padding: 12px 18px;
+      z-index: 1040;
+      box-shadow: 0 -6px 26px rgba(0,0,0,0.35);
+      animation: cartBarSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes cartBarSlideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
 
     .product-details-box {
@@ -564,6 +619,31 @@
       color: #ffffff;
       transform: translateY(-3px);
       box-shadow: 0 8px 24px rgba(37, 211, 102, 0.55);
+    }
+
+    body.has-cart-items .floating-whatsapp-omf {
+      bottom: 84px !important;
+    }
+
+    @media (max-width: 576px) {
+      body.has-cart-items .floating-whatsapp-omf {
+        bottom: 96px !important;
+      }
+    }
+
+    .btn-whatsapp-order {
+      background-color: #25D366 !important;
+      border-color: #25D366 !important;
+      color: #ffffff !important;
+      transition: all 0.2s ease;
+    }
+
+    .btn-whatsapp-order:hover, .btn-whatsapp-order:focus {
+      background-color: #1ebd5b !important;
+      border-color: #1ebd5b !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.45);
+      transform: translateY(-1px);
     }
 
     /* 8. MOBILE BOTTOM STICKY BAR */
@@ -783,10 +863,23 @@
 <body>
 
   <!-- ==================== 1. TOP ANNOUNCEMENT BAR ==================== -->
-  <div class="top-announcement-bar">
-    <span class="nav-arrow">&lt;</span>
-    <span>SHOP WITH CONFIDENCE &nbsp;|&nbsp; FREE SHIPPING ABOVE ₹999 &nbsp;|&nbsp; DISPATCHED WITHIN 24 HOURS</span>
-    <span class="nav-arrow">&gt;</span>
+  <div class="top-announcement-bar d-flex align-items-center justify-content-between px-2 px-md-4">
+    <div class="d-none d-lg-flex align-items-center gap-2" style="font-size: 11px;">
+      <span class="badge bg-warning text-dark fw-bold" style="font-size: 9.5px; letter-spacing: 0.5px;">BHANDUP STORE</span>
+    </div>
+    <div class="text-center flex-grow-1 text-truncate px-2">
+      <span class="nav-arrow">&lt;</span>
+      <span>SHOP WITH CONFIDENCE &nbsp;|&nbsp; FREE SHIPPING ABOVE ₹999 &nbsp;|&nbsp; DISPATCHED WITHIN 24 HOURS</span>
+      <span class="nav-arrow">&gt;</span>
+    </div>
+    <div class="d-flex align-items-center">
+      <button class="btn btn-sm btn-outline-light py-0 px-2 d-flex align-items-center gap-1.5" type="button" data-bs-toggle="modal" data-bs-target="#shopOwnerSettingsModal" style="font-size: 10.5px; border-radius: 20px; border-color: rgba(255,255,255,0.35);" title="Shop Owner WhatsApp Number Settings">
+        <i class="fa-brands fa-whatsapp text-success fs-6"></i>
+        <span class="d-none d-sm-inline opacity-75">Store WA:</span>
+        <strong id="topBarShopWhatsAppNumber" class="text-white font-monospace">91XXXXXXXXXX</strong>
+        <i class="fa-solid fa-gear ms-1 opacity-75" style="font-size: 9px;"></i>
+      </button>
+    </div>
   </div>
 
   <!-- ==================== 2. HEADER (Exact OmartFashion layout) ==================== -->
@@ -821,7 +914,23 @@
             <button class="header-icon-btn dropdown-toggle no-arrow" type="button" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User Account">
               <i class="fa-regular fa-user"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" aria-labelledby="userMenuBtn" style="font-size: 13px; min-width: 230px; border-radius: 12px;">
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" aria-labelledby="userMenuBtn" style="font-size: 13px; min-width: 290px; border-radius: 12px;">
+              <li><h6 class="dropdown-header text-uppercase fw-bold text-dark" style="font-size: 11px; letter-spacing: 1px;"><i class="fa-brands fa-whatsapp text-success me-1"></i> Store WhatsApp Settings</h6></li>
+              <li class="px-3 py-2 bg-light mx-2 my-1 rounded-3 border">
+                <label for="headerShopWhatsAppInput" class="form-label mb-1 fw-bold text-dark d-flex align-items-center justify-content-between" style="font-size: 11px;">
+                  <span>Shop WhatsApp No.</span>
+                  <span class="badge bg-success-subtle text-success">Shop Owner</span>
+                </label>
+                <div class="input-group input-group-sm mb-1">
+                  <input type="text" class="form-control font-monospace" id="headerShopWhatsAppInput" placeholder="91XXXXXXXXXX" value="91XXXXXXXXXX" style="font-size: 12px;">
+                  <button class="btn btn-dark fw-bold px-2.5" type="button" onclick="saveShopWhatsAppFromInput()" title="Save Store WhatsApp Number">Save</button>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                  <span class="text-muted" style="font-size: 10px;" id="headerWhatsAppSavedNotice">Orders go to: 91XXXXXXXXXX</span>
+                  <button class="btn btn-link p-0 text-muted" style="font-size: 10px;" onclick="resetShopWhatsAppNumber()">Reset</button>
+                </div>
+              </li>
+              <li><hr class="dropdown-divider"></li>
               <li><h6 class="dropdown-header text-uppercase fw-bold text-dark" style="font-size: 11px; letter-spacing: 1px;">Men's Wardrobe</h6></li>
               <li><a class="dropdown-item" href="#newDropSection"><i class="fa-solid fa-shirt me-2 text-muted"></i>Shop All Shirts &amp; Kurtas</a></li>
               <li><a class="dropdown-item" href="#contactSection"><i class="fa-solid fa-location-dot me-2 text-muted"></i>Bhandup West Store</a></li>
@@ -834,6 +943,13 @@
               </li>
             </ul>
           </div>
+
+          <!-- Top Header Wishlist Button: ❤️ {wishlistCount} Wishlist -->
+          <button class="header-icon-btn d-flex align-items-center gap-1.5 px-2 py-1 rounded-pill bg-light border border-secondary border-opacity-25 shadow-xs" type="button" data-bs-toggle="offcanvas" data-bs-target="#wishlistDrawer" aria-label="Open Wishlist" title="View Wishlist">
+            <i class="fa-solid fa-heart text-danger"></i>
+            <span class="badge rounded-pill bg-danger text-white px-1.5 py-0.5" id="wishlistCountBadge" style="font-size: 10px;">0</span>
+            <span class="d-none d-sm-inline fw-bold text-dark" style="font-size: 12px;">Wishlist</span>
+          </button>
 
           <!-- Shopping Bag Button -->
           <button class="header-icon-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#cartDrawer" aria-label="Open Cart">
@@ -1077,6 +1193,34 @@
     </button>
   </div>
 
+  <!-- ==================== STICKY CART BOTTOM BAR (Appears when cart > 0) ==================== -->
+  <div id="cartStickyBottomBar" class="cart-sticky-bottom-bar" style="display: none;">
+    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-3">
+        <div class="position-relative" style="width: 42px; height: 42px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fa-solid fa-bag-shopping text-warning fs-5"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartBottomQtyBadge" style="font-size: 10px;">1</span>
+        </div>
+        <div>
+          <div class="text-white fw-bold small" id="cartBottomItemsText">1 Item in Bag</div>
+          <div class="text-warning fw-extrabold fs-6" id="cartBottomPriceText">Rs. 799.00</div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <!-- 1. Order on WhatsApp green button -->
+        <button class="btn btn-success btn-whatsapp-order fw-bold rounded-pill px-3 px-sm-4 py-2 d-flex align-items-center gap-2 shadow-sm text-white" onclick="handleWhatsAppOrder()" title="Send Cart Order on WhatsApp">
+          <i class="fa-brands fa-whatsapp fs-5"></i>
+          <span>Order on WhatsApp</span>
+        </button>
+        <!-- 2. Checkout button -->
+        <button class="btn btn-warning text-dark fw-bold rounded-pill px-3 px-sm-4 py-2 d-flex align-items-center gap-2 shadow-sm" onclick="handleDirectCheckout()" title="Proceed to Checkout">
+          <i class="fa-solid fa-truck-fast"></i>
+          <span>Checkout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== 10. PRODUCT DETAIL MODAL (Exact OmartFashion Screenshot) ==================== -->
   <div class="modal fade" id="productDetailModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -1147,11 +1291,17 @@
                 </div>
               </div>
 
-              <!-- Action Buttons: Add to Bag & BUY NOW -->
+              <!-- Action Buttons: Add to Bag, BUY NOW & Wishlist -->
               <div class="d-grid gap-2 mb-4">
-                <button class="btn btn-add-bag-outline" onclick="addModalItemToCart()">
-                  <i class="fa-solid fa-bag-shopping me-2"></i> ADD TO CART
-                </button>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-add-bag-outline flex-grow-1" onclick="addModalItemToCart()">
+                    <i class="fa-solid fa-bag-shopping me-2"></i> ADD TO CART
+                  </button>
+                  <button class="btn btn-outline-danger px-3 py-2 fw-bold d-flex align-items-center justify-content-center gap-1" id="modalWishlistBtn" onclick="toggleWishlist(activeProduct.id); updateModalWishlistBtn();" title="Toggle Wishlist">
+                    <i class="fa-heart fa-regular fs-5" id="modalWishlistIcon"></i>
+                    <span class="d-none d-sm-inline" id="modalWishlistText">Wishlist</span>
+                  </button>
+                </div>
                 <button class="btn btn-buy-now-black" onclick="quickBuyNow()">
                   <span>BUY NOW</span>
                   <span class="badge bg-light text-dark fw-bold ms-2 py-1 px-2" style="font-size: 11px;">
@@ -1218,13 +1368,44 @@
           <span id="cartGrandTotalText">Rs. 0</span>
         </div>
 
-        <button class="btn btn-dark w-100 py-3 rounded-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2" id="proceedCheckoutBtn" onclick="openCustomerCheckoutModal()" disabled>
-          <span>PROCEED TO CHECKOUT</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
-        <p class="text-center text-muted small mt-2 mb-0" style="font-size: 11px;">
-          <i class="fa-solid fa-truck-fast text-success me-1"></i> Dispatched in 24h &bull; Cash on Delivery Available
+        <div class="d-grid gap-2 mb-2">
+          <!-- 1. Order on WhatsApp green button -->
+          <button class="btn btn-success btn-whatsapp-order w-100 py-2.5 rounded-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2 shadow-sm text-white" id="drawerWhatsAppOrderBtn" onclick="handleWhatsAppOrder()" disabled>
+            <i class="fa-brands fa-whatsapp fs-5"></i>
+            <span>ORDER ON WHATSAPP</span>
+          </button>
+          <!-- 2. Standard COD Checkout button -->
+          <button class="btn btn-dark w-100 py-2.5 rounded-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2" id="proceedCheckoutBtn" onclick="handleDirectCheckout()" disabled>
+            <i class="fa-solid fa-truck-fast text-warning"></i>
+            <span>CHECKOUT (CASH ON DELIVERY)</span>
+          </button>
+        </div>
+        <p class="text-center text-muted small mt-1 mb-0" style="font-size: 11px;">
+          <i class="fa-solid fa-circle-check text-success me-1"></i> Dispatched in 24h &bull; Cash on Delivery Available
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== OFFCANVAS WISHLIST DRAWER ==================== -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="wishlistDrawer" style="width: 390px; max-width: 90vw;">
+    <div class="offcanvas-header border-bottom">
+      <h5 class="offcanvas-title fw-bold" style="font-size: 16px;">
+        <i class="fa-solid fa-heart text-danger me-2"></i> YOUR WISHLIST (<span id="wishlistDrawerCount">0</span>)
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    
+    <div class="offcanvas-body d-flex flex-column p-3">
+      <div class="flex-grow-1 overflow-auto" id="wishlistItemsList">
+        <!-- Rendered wishlisted products -->
+      </div>
+
+      <div class="border-top pt-3 mt-auto">
+        <button class="btn btn-dark w-100 py-2.5 rounded-pill fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2" data-bs-dismiss="offcanvas" onclick="document.getElementById('newDropSection').scrollIntoView({behavior: 'smooth'})">
+          <i class="fa-solid fa-shirt"></i>
+          <span>EXPLORE MEN'S DROPS</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1332,6 +1513,62 @@
         <input type="text" class="form-control rounded-pill py-2 px-3 mb-3 border-2 border-dark" id="searchInput" placeholder="Search printed shirts, short kurta, t-shirts, cargo..." onkeyup="performSearch(this.value)">
         <div id="searchResultsBox" class="overflow-auto" style="max-height: 280px;">
           <div class="text-muted small text-center py-3">Type any keyword above to search catalog.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOP OWNER WHATSAPP SETTINGS MODAL -->
+  <div class="modal fade" id="shopOwnerSettingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+        <div class="modal-header bg-dark text-white py-3">
+          <div class="d-flex align-items-center gap-2">
+            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+              <i class="fa-brands fa-whatsapp fs-5"></i>
+            </div>
+            <div>
+              <h6 class="modal-title fw-bold mb-0">Shop Owner WhatsApp Settings</h6>
+              <span class="small text-white-50" style="font-size: 11px;">Configure store order receiving number</span>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="alert alert-success border-0 rounded-3 small mb-3">
+            <i class="fa-solid fa-circle-check me-1"></i>
+            When customers click <strong>"Order on WhatsApp"</strong> in the bottom bar or bag, their items and delivery info will be sent to this WhatsApp number!
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-uppercase text-secondary">Store WhatsApp Number</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light fw-bold text-success"><i class="fa-brands fa-whatsapp"></i></span>
+              <input type="text" class="form-control form-control-lg fw-bold font-monospace" id="modalShopWhatsAppInput" placeholder="91XXXXXXXXXX" value="91XXXXXXXXXX">
+            </div>
+            <div class="form-text small text-muted">
+              Enter phone with country code (e.g. <code>91XXXXXXXXXX</code> or <code>918356076145</code>). Placeholder default is <code>91XXXXXXXXXX</code>.
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 mb-4">
+            <div>
+              <div class="small fw-bold text-dark">Active Order Receiver:</div>
+              <div class="text-success fw-bold font-monospace" id="modalActiveWhatsAppDisplay">91XXXXXXXXXX</div>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="resetShopWhatsAppNumber()">
+              Reset to Default
+            </button>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-dark py-2.5 fw-bold rounded-3" onclick="saveShopWhatsAppFromModal()">
+              <i class="fa-solid fa-floppy-disk me-1.5 text-warning"></i> SAVE WHATSAPP NUMBER
+            </button>
+            <button type="button" class="btn btn-light py-2 rounded-3 text-muted" data-bs-dismiss="modal">
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1589,12 +1826,25 @@
     let selectedSize = 'L';
     let selectedQty = 1;
     let cart = [];
+    let wish = [];
+
+    const WHATSAPP_STORAGE_KEY = 'smw_shop_whatsapp';
+    const DEFAULT_WHATSAPP_PLACEHOLDER = '91XXXXXXXXXX';
 
     // Initialize Store
     function initStore() {
       // Force update to 100% male catalog
       localStorage.setItem(DB_KEY, JSON.stringify(MENS_CATALOG));
       products = [...MENS_CATALOG];
+
+      // Load Wishlist from localStorage (Key: "wish")
+      try {
+        const storedWish = localStorage.getItem('wish');
+        wish = storedWish ? JSON.parse(storedWish) : [];
+      } catch(e) {
+        wish = [];
+      }
+      updateWishlistUI();
 
       // Load cart
       const storedCart = localStorage.getItem('SOMAIYA_CUSTOMER_CART');
@@ -1606,12 +1856,85 @@
         }
       }
 
+      // Synchronize Shop Owner WhatsApp settings UI
+      syncShopWhatsAppUI();
+
       renderProductsGrid();
       updateCartDisplay();
+      renderWishlistDrawer();
 
       if (products.length > 0) {
         setStickyBar(products[0]);
       }
+    }
+
+    // Wishlist Toggle Logic (localStorage key: "wish")
+    function toggleWishlist(id) {
+      const idx = wish.indexOf(id);
+      if (idx > -1) {
+        wish.splice(idx, 1);
+      } else {
+        wish.push(id);
+      }
+      localStorage.setItem('wish', JSON.stringify(wish));
+      updateWishlistUI();
+      renderProductsGrid();
+      renderWishlistDrawer();
+    }
+
+    function updateWishlistUI() {
+      const count = wish.length;
+      const countEl = document.getElementById('wishlistCountBadge');
+      if (countEl) countEl.textContent = count;
+      const drawerCountEl = document.getElementById('wishlistDrawerCount');
+      if (drawerCountEl) drawerCountEl.textContent = count;
+    }
+
+    // Render Wishlist Drawer
+    function renderWishlistDrawer() {
+      const listEl = document.getElementById('wishlistItemsList');
+      if (!listEl) return;
+
+      const wishProducts = products.filter(p => wish.includes(p.id));
+      if (wishProducts.length === 0) {
+        listEl.innerHTML = `
+          <div class="text-center py-5 text-muted">
+            <div class="mb-3">
+              <i class="fa-regular fa-heart fs-1 text-danger opacity-50"></i>
+            </div>
+            <h6 class="fw-bold text-dark">Your Wishlist is Empty</h6>
+            <p class="small text-muted mb-4">Tap the ❤️ heart button on any product to save it to your personal wishlist!</p>
+            <button class="btn btn-dark rounded-pill px-4 py-2 fw-bold" data-bs-dismiss="offcanvas" onclick="document.getElementById('newDropSection').scrollIntoView({behavior: 'smooth'})">
+              <i class="fa-solid fa-shirt me-1"></i> Browse Men's Collection
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = wishProducts.map(p => `
+        <div class="d-flex align-items-center gap-3 py-3 border-bottom position-relative">
+          <img src="${p.image}" alt="${p.name}" style="width: 70px; height: 85px; object-fit: cover; border-radius: 8px;">
+          <div class="flex-grow-1">
+            <div class="fw-bold text-dark text-truncate" style="font-size: 13.5px; max-width: 190px;">${p.name}</div>
+            <div class="d-flex align-items-center gap-2 my-1">
+              <span class="fw-extrabold text-dark" style="font-size: 13.5px;">Rs. ${p.price}.00</span>
+              <span class="text-muted text-decoration-line-through small">Rs. ${p.originalPrice || 1249}.00</span>
+            </div>
+            <div class="small ${p.qty < 5 ? 'text-danger fw-bold' : 'text-success'} mb-2" style="font-size: 11px;">
+              ${p.qty < 5 ? `🔥 Only ${p.qty} Left in Stock!` : `✓ In Stock (${p.qty} available)`}
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-dark rounded-pill px-3 py-1 fw-bold" onclick="quickAddFromCard('${p.id}')">
+                <i class="fa-solid fa-bag-shopping me-1"></i> Move to Bag
+              </button>
+              <button class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1" onclick="toggleWishlist('${p.id}')" title="Remove from Wishlist">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
     }
 
     // Render Product Cards
@@ -1629,26 +1952,57 @@
       heading.textContent = currentCategory === 'All' ? 'NEW DROP' : `${currentCategory.toUpperCase()} COLLECTION`;
       clearBtn.style.display = currentCategory === 'All' ? 'none' : 'inline-block';
 
-      container.innerHTML = filtered.map(p => `
+      container.innerHTML = filtered.map(p => {
+        const isWish = wish.includes(p.id);
+        const isLowStock = p.qty < 5;
+
+        return `
         <div class="col-6 col-md-3">
           <div class="product-card-omf" onclick="showProductDetails('${p.id}')">
-            <div class="product-img-box">
+            <div class="product-img-box position-relative">
               <span class="sale-pill-badge">Sale</span>
+              ${isLowStock ? `
+                <span class="badge bg-danger position-absolute top-0 end-0 m-2 fw-bold text-white shadow-sm" style="font-size: 10px; z-index: 5;">
+                  <i class="fa-solid fa-fire me-1"></i>Only ${p.qty} Left!
+                </span>` : ''}
+              
               <img src="${p.image}" alt="${p.name}" loading="lazy">
+              
+              <!-- Quick Add to Bag -->
               <button class="bag-plus-btn" title="Add to Bag" onclick="event.stopPropagation(); quickAddFromCard('${p.id}')">
                 <i class="fa-solid fa-bag-shopping"></i>
               </button>
+
+              <!-- Heart Button: Bottom-Right of Image (🤍 when unselected, ❤️ red when clicked) -->
+              <button class="wishlist-heart-btn ${isWish ? 'active' : ''}" title="${isWish ? 'Remove from Wishlist' : 'Add to Wishlist'}" onclick="event.stopPropagation(); toggleWishlist('${p.id}')">
+                <i class="${isWish ? 'fa-solid text-danger' : 'fa-regular'} fa-heart"></i>
+              </button>
             </div>
+
             <div class="product-details-box">
               <div class="product-card-title" title="${p.name}">${p.name}</div>
+              
               <div class="product-price-line">
                 <span class="price-sale-bold">Rs. ${p.price}.00</span>
                 <span class="price-mrp-cut">Rs. ${p.originalPrice || 1249}.00</span>
+                <span class="text-success small fw-bold ms-1">${p.discountPercent || 36}% OFF</span>
+              </div>
+
+              <!-- Rating ⭐ & Stock Text -->
+              <div class="d-flex align-items-center justify-content-between mt-1 pt-1 border-top" style="font-size: 11px;">
+                <span class="badge bg-warning text-dark fw-bold px-1.5 py-0.5">
+                  <i class="fa-solid fa-star text-dark"></i> 4.8
+                </span>
+                ${isLowStock 
+                  ? `<span class="text-danger fw-bold"><i class="fa-solid fa-triangle-exclamation me-1"></i>Only ${p.qty} Left!</span>` 
+                  : `<span class="text-muted"><i class="fa-solid fa-box-archive me-1 text-success"></i>Stock: ${p.qty}</span>`
+                }
               </div>
             </div>
           </div>
         </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function filterCategory(cat) {
@@ -1689,9 +2043,32 @@
         <button type="button" class="size-box-omf ${s === selectedSize ? 'active' : ''}" onclick="setModalSize('${s}', this)">${s}</button>
       `).join('');
 
+      updateModalWishlistBtn();
+
       const modalEl = document.getElementById('productDetailModal');
       const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
       bsModal.show();
+    }
+
+    function updateModalWishlistBtn() {
+      if (!activeProduct) return;
+      const isWish = wish.includes(activeProduct.id);
+      const icon = document.getElementById('modalWishlistIcon');
+      const text = document.getElementById('modalWishlistText');
+      const btn = document.getElementById('modalWishlistBtn');
+      if (icon && text && btn) {
+        if (isWish) {
+          icon.className = 'fa-solid fa-heart text-danger fs-5';
+          text.textContent = 'Saved in Wishlist';
+          btn.classList.remove('btn-outline-danger');
+          btn.classList.add('btn-danger', 'text-white');
+        } else {
+          icon.className = 'fa-regular fa-heart fs-5';
+          text.textContent = 'Wishlist';
+          btn.classList.remove('btn-danger', 'text-white');
+          btn.classList.add('btn-outline-danger');
+        }
+      }
     }
 
     function setModalSize(size, btn) {
@@ -1787,13 +2164,22 @@
         totalEl.textContent = 'Rs. 0';
         feeEl.textContent = 'Calculated at Checkout';
         btn.disabled = true;
+        const drawerWaBtn = document.getElementById('drawerWhatsAppOrderBtn');
+        if (drawerWaBtn) drawerWaBtn.disabled = true;
         prog.style.width = '0%';
         notice.textContent = 'Free Shipping above ₹999';
         pct.textContent = '0%';
+
+        // Hide Cart Sticky Bottom Bar when cart is empty
+        const cartStickyBar = document.getElementById('cartStickyBottomBar');
+        if (cartStickyBar) cartStickyBar.style.display = 'none';
+        document.body.classList.remove('has-cart-items');
         return;
       }
 
       btn.disabled = false;
+      const drawerWaBtn = document.getElementById('drawerWhatsAppOrderBtn');
+      if (drawerWaBtn) drawerWaBtn.disabled = false;
       const isFree = subtotal >= 999;
       const shipCost = isFree ? 0 : 99;
       const percentVal = Math.min(100, Math.round((subtotal / 999) * 100));
@@ -1813,6 +2199,19 @@
       const grand = subtotal + shipCost;
       subtotalEl.textContent = `Rs. ${subtotal.toLocaleString('en-IN')}`;
       totalEl.textContent = `Rs. ${grand.toLocaleString('en-IN')}`;
+
+      // Update and Show Cart Sticky Bottom Bar when cart > 0
+      const cartStickyBar = document.getElementById('cartStickyBottomBar');
+      if (cartStickyBar) {
+        cartStickyBar.style.display = 'block';
+        const bottomQty = document.getElementById('cartBottomQtyBadge');
+        if (bottomQty) bottomQty.textContent = totalUnits;
+        const bottomText = document.getElementById('cartBottomItemsText');
+        if (bottomText) bottomText.textContent = `${totalUnits} Item${totalUnits > 1 ? 's' : ''} in Bag`;
+        const bottomPrice = document.getElementById('cartBottomPriceText');
+        if (bottomPrice) bottomPrice.textContent = `Rs. ${grand.toLocaleString('en-IN')}.00`;
+        document.body.classList.add('has-cart-items');
+      }
 
       listContainer.innerHTML = cart.map((item, idx) => `
         <div class="d-flex gap-3 py-3 border-bottom">
@@ -1854,6 +2253,112 @@
       const drawerEl = document.getElementById('cartDrawer');
       const bsDrawer = bootstrap.Offcanvas.getOrCreateInstance(drawerEl);
       bsDrawer.show();
+    }
+
+    // ==================== STORE WHATSAPP & ORDER ON WHATSAPP LOGIC ====================
+    function getShopWhatsAppNumber() {
+      const saved = localStorage.getItem(WHATSAPP_STORAGE_KEY);
+      return (saved && saved.trim()) ? saved.trim() : DEFAULT_WHATSAPP_PLACEHOLDER;
+    }
+
+    function saveShopWhatsAppNumber(newNumber) {
+      const val = (newNumber && newNumber.trim()) ? newNumber.trim() : DEFAULT_WHATSAPP_PLACEHOLDER;
+      localStorage.setItem(WHATSAPP_STORAGE_KEY, val);
+      syncShopWhatsAppUI(val);
+      return val;
+    }
+
+    function saveShopWhatsAppFromInput() {
+      const inputEl = document.getElementById('headerShopWhatsAppInput');
+      const val = inputEl ? inputEl.value : '';
+      const saved = saveShopWhatsAppNumber(val);
+      alert(`Store WhatsApp number updated to: ${saved}\nCustomer WhatsApp orders will now be sent to this number!`);
+    }
+
+    function saveShopWhatsAppFromModal() {
+      const inputEl = document.getElementById('modalShopWhatsAppInput');
+      const val = inputEl ? inputEl.value : '';
+      const saved = saveShopWhatsAppNumber(val);
+      const modalEl = document.getElementById('shopOwnerSettingsModal');
+      if (modalEl) {
+        const bsModal = bootstrap.Modal.getInstance(modalEl);
+        if (bsModal) bsModal.hide();
+      }
+      alert(`Store WhatsApp number successfully saved: ${saved}`);
+    }
+
+    function resetShopWhatsAppNumber() {
+      saveShopWhatsAppNumber(DEFAULT_WHATSAPP_PLACEHOLDER);
+      alert(`Store WhatsApp number reset to default placeholder: ${DEFAULT_WHATSAPP_PLACEHOLDER}`);
+    }
+
+    function syncShopWhatsAppUI(number) {
+      const num = number || getShopWhatsAppNumber();
+      const topBarEl = document.getElementById('topBarShopWhatsAppNumber');
+      if (topBarEl) topBarEl.textContent = num;
+
+      const headerInput = document.getElementById('headerShopWhatsAppInput');
+      if (headerInput) headerInput.value = num;
+
+      const noticeEl = document.getElementById('headerWhatsAppSavedNotice');
+      if (noticeEl) {
+        noticeEl.textContent = (num === DEFAULT_WHATSAPP_PLACEHOLDER)
+          ? 'Orders go to: 91XXXXXXXXXX'
+          : `Active: ${num}`;
+      }
+
+      const modalInput = document.getElementById('modalShopWhatsAppInput');
+      if (modalInput) modalInput.value = num;
+
+      const modalDisplay = document.getElementById('modalActiveWhatsAppDisplay');
+      if (modalDisplay) modalDisplay.textContent = num;
+    }
+
+    // Customer clicks "Order on WhatsApp"
+    function handleWhatsAppOrder() {
+      if (!cart || cart.length === 0) {
+        alert("Your shopping bag is empty! Please add products before ordering on WhatsApp.");
+        return;
+      }
+
+      const phone = getShopWhatsAppNumber();
+
+      // Calculate total item price
+      const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+      // Create WhatsApp message format requested:
+      // "Hi SOMAIYA MENS WEAR, New Order:
+      // 1. Classic White Shirt x1 - ₹899 (L)
+      // 2. Denim Jeans x1 - ₹1299 (32)
+      // Total: ₹2198
+      // My Name: 
+      // Address: "
+      const orderLines = cart.map((item, idx) => {
+        const itemTotal = item.price * item.qty;
+        const sizeTag = item.size ? ` (${item.size})` : '';
+        return `${idx + 1}. ${item.name} x${item.qty} - ₹${itemTotal}${sizeTag}`;
+      });
+
+      const message = `Hi SOMAIYA MENS WEAR, New Order:\n${orderLines.join('\n')}\nTotal: ₹${total}\nMy Name: \nAddress: `;
+
+      const targetPhone = (phone && phone.trim()) ? phone.trim() : DEFAULT_WHATSAPP_PLACEHOLDER;
+      const encodedMsg = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${targetPhone}?text=${encodedMsg}`;
+
+      // Open WhatsApp order link
+      const opened = window.open(whatsappUrl, '_blank');
+      if (!opened) {
+        window.location.href = whatsappUrl;
+      }
+    }
+
+    // Customer clicks "Checkout" (Normal Checkout with Cash on Delivery)
+    function handleDirectCheckout() {
+      if (!cart || cart.length === 0) {
+        alert("Your shopping bag is empty! Please add items to checkout.");
+        return;
+      }
+      openCustomerCheckoutModal();
     }
 
     function openCustomerCheckoutModal() {
